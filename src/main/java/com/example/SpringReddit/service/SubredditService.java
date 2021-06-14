@@ -19,11 +19,11 @@ public class SubredditService {
 
 	private final SubredditRepository subredditRepository;
 	private final SubredditMapper subredditMapper;
+	private final AuthService authService;
 
 	public SubredditDto create(SubredditDto subredditDto) {
-		Subreddit subreddit = subredditRepository.save(subredditMapper.fromDto(subredditDto));
-		subredditDto.setId(subreddit.getId());
-		return subredditDto;
+		Subreddit subreddit = subredditRepository.save(subredditMapper.fromDto(subredditDto, authService.getCurrentUser()));
+		return subredditMapper.toDto(subreddit);
 	}
 
 	@Transactional(readOnly = true)
@@ -38,6 +38,6 @@ public class SubredditService {
 	public SubredditDto getSubreddit(Long id) {
 		return subredditRepository.findById(id)
 				.map(subredditMapper::toDto)
-				.orElseThrow(() -> new SubredditNotFoundException("Subreddit with id " + id + "does not exist"));
+				.orElseThrow(() -> new SubredditNotFoundException(id));
 	}
 }

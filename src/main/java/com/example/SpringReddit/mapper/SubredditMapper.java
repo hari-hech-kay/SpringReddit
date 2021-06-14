@@ -1,26 +1,26 @@
 package com.example.SpringReddit.mapper;
 
 import com.example.SpringReddit.dto.SubredditDto;
-import com.example.SpringReddit.model.Post;
+import com.example.SpringReddit.model.RedditUser;
 import com.example.SpringReddit.model.Subreddit;
-import org.jetbrains.annotations.NotNull;
-import org.mapstruct.InheritInverseConfiguration;
+import com.example.SpringReddit.repository.PostRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
-public interface SubredditMapper {
+public abstract class SubredditMapper {
 
-	@Mapping(target = "postCount", expression = "java(mapPosts(subreddit.getPosts()))")
-	SubredditDto toDto(Subreddit subreddit);
+	@Autowired
+	private PostRepository postRepository;
 
-	default Integer mapPosts(@NotNull List<Post> posts) {
-		return posts.size();
+	@Mapping(target = "postCount", expression = "java(postCount(subreddit))")
+	public abstract SubredditDto toDto(Subreddit subreddit);
+
+	Integer postCount(Subreddit subreddit) {
+		return postRepository.findAllBySubreddit(subreddit).size();
 	}
 
-	@InheritInverseConfiguration
-	@Mapping(target = "posts", ignore = true)
-	Subreddit fromDto(SubredditDto subredditDto);
+	@Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
+	public abstract Subreddit fromDto(SubredditDto subredditDto, RedditUser user);
 }

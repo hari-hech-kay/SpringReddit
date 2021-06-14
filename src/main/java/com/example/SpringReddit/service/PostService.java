@@ -4,6 +4,7 @@ import com.example.SpringReddit.dto.PostRequest;
 import com.example.SpringReddit.dto.PostResponse;
 import com.example.SpringReddit.exception.PostNotFoundException;
 import com.example.SpringReddit.exception.SubredditNotFoundException;
+import com.example.SpringReddit.exception.UserNotFoundException;
 import com.example.SpringReddit.mapper.PostMapper;
 import com.example.SpringReddit.model.Post;
 import com.example.SpringReddit.model.RedditUser;
@@ -14,7 +15,6 @@ import com.example.SpringReddit.repository.RedditUserRepository;
 import com.example.SpringReddit.repository.SubredditRepository;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +34,7 @@ public class PostService {
 
 	public Long create(@NotNull PostRequest postRequest) {
 		Subreddit subreddit = subredditRepository.findByName(postRequest.getSubredditName())
-				.orElseThrow(() -> new SubredditNotFoundException("Subreddit r/" + postRequest.getSubredditName() + "does not exist"));
+				.orElseThrow(() -> new SubredditNotFoundException(postRequest.getSubredditName()));
 		RedditUser user = authService.getCurrentUser();
 		return postRepository.save(postMapper.fromDto(postRequest, subreddit, user)).getPostId();
 	}
@@ -49,13 +49,13 @@ public class PostService {
 	@Transactional(readOnly = true)
 	public PostResponse getPost(Long id) {
 		return postRepository.findById(id).map(postMapper::toDto)
-				.orElseThrow(() -> new PostNotFoundException("Post with id " + id + " does not exist"));
+				.orElseThrow(() -> new PostNotFoundException(id.toString()));
 	}
 
 	@Transactional(readOnly = true)
 	public List<PostResponse> getPostsBySubreddit(Long subredditId) {
 		Subreddit subreddit = subredditRepository.findById(subredditId)
-				.orElseThrow(() -> new SubredditNotFoundException("Subreddit with id " + subredditId + " does not exist"));
+				.orElseThrow(() -> new SubredditNotFoundException(subredditId));
 		return postRepository.findAllBySubreddit(subreddit)
 				.stream().map(postMapper::toDto)
 				.collect(Collectors.toList());
@@ -65,7 +65,7 @@ public class PostService {
 	@Transactional(readOnly = true)
 	public List<PostResponse> getPostsByUser(String username) {
 		RedditUser user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User with id " + username + " does not exist"));
+				.orElseThrow(() -> new UserNotFoundException("User with id " + username + " does not exist"));
 		return postRepository.findAllByUser(user)
 				.stream().map(postMapper::toDto)
 				.collect(Collectors.toList());
@@ -74,7 +74,7 @@ public class PostService {
 
 	public void delete(Long postId) {
 		Post post = postRepository.findById(postId)
-				.orElseThrow(() -> new PostNotFoundException("Post with id " + postId + " does not exist"));
+				.orElseThrow(() -> new PostNotFoundException(postId.toString()));
 		if (post.getUser().getUserId().equals(authService.getCurrentUser().getUserId())) {
 			commentRepository.deleteAllByPost(post);
 			postRepository.deleteById(postId);

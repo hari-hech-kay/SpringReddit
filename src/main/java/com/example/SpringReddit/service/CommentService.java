@@ -3,6 +3,7 @@ package com.example.SpringReddit.service;
 import com.example.SpringReddit.dto.CommentDto;
 import com.example.SpringReddit.exception.CommentNotFoundException;
 import com.example.SpringReddit.exception.PostNotFoundException;
+import com.example.SpringReddit.exception.UserNotFoundException;
 import com.example.SpringReddit.mapper.CommentMapper;
 import com.example.SpringReddit.model.Comment;
 import com.example.SpringReddit.model.Post;
@@ -11,7 +12,6 @@ import com.example.SpringReddit.repository.CommentRepository;
 import com.example.SpringReddit.repository.PostRepository;
 import com.example.SpringReddit.repository.RedditUserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +32,7 @@ public class CommentService {
 
 	public Long create(CommentDto commentDto) {
 		Post post = postRepository.findById(commentDto.getPostId())
-				.orElseThrow(() -> new PostNotFoundException("Post not found with id " + commentDto.getPostId()));
+				.orElseThrow(() -> new PostNotFoundException(commentDto.getPostId().toString()));
 
 		return commentRepository.save(commentMapper.fromDto(commentDto, post, authService.getCurrentUser())).getId();
 	}
@@ -40,7 +40,7 @@ public class CommentService {
 	@Transactional(readOnly = true)
 	public List<CommentDto> getByPost(Long postId) {
 		Post post = postRepository.findById(postId)
-				.orElseThrow(() -> new PostNotFoundException("Post not found with id " + postId));
+				.orElseThrow(() -> new PostNotFoundException(postId.toString()));
 		return commentRepository.findAllByPost(post)
 				.stream().map(commentMapper::toDto)
 				.collect(Collectors.toList());
@@ -49,7 +49,7 @@ public class CommentService {
 	@Transactional(readOnly = true)
 	public List<CommentDto> getByUser(String username) {
 		RedditUser user = redditUserRepository.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User not found with username u/" + username));
+				.orElseThrow(() -> new UserNotFoundException("User not found with username u/" + username));
 		return commentRepository.findAllByUser(user)
 				.stream().map(commentMapper::toDto)
 				.collect(Collectors.toList());
@@ -57,7 +57,7 @@ public class CommentService {
 
 	public void delete(Long commentId) {
 		Comment comment = commentRepository.findById(commentId)
-				.orElseThrow(() -> new CommentNotFoundException("Comment not found with id " + commentId));
+				.orElseThrow(() -> new CommentNotFoundException(commentId.toString()));
 		;
 		if (comment.getUser().getUserId().equals(authService.getCurrentUser().getUserId()))
 			commentRepository.deleteById(commentId);

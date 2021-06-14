@@ -4,6 +4,7 @@ import com.example.SpringReddit.dto.AuthenticationResponse;
 import com.example.SpringReddit.dto.LoginRequest;
 import com.example.SpringReddit.dto.RegisterRequest;
 import com.example.SpringReddit.exception.RedditException;
+import com.example.SpringReddit.exception.UserNotFoundException;
 import com.example.SpringReddit.model.Email;
 import com.example.SpringReddit.model.RedditUser;
 import com.example.SpringReddit.model.VerificationToken;
@@ -18,7 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,8 +84,10 @@ public class AuthService {
 	}
 
 	public RedditUser getCurrentUser() {
-		User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) return null;
+		User principal = (User) auth.getPrincipal();
 		return userRepository.findByUsername(principal.getUsername())
-				.orElseThrow(() -> new UsernameNotFoundException("User not found with username " + principal.getUsername()));
+				.orElseThrow(() -> new UserNotFoundException("User not found with username " + principal.getUsername()));
 	}
 }

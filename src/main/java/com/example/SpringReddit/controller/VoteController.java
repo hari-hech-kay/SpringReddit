@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/vote")
@@ -16,7 +18,7 @@ public class VoteController {
 	private final VoteService voteService;
 
 	@PostMapping
-	public void vote(@RequestBody VoteDto voteDto) {
+	public void vote(@Valid @RequestBody VoteDto voteDto) {
 		voteService.vote(voteDto);
 	}
 }

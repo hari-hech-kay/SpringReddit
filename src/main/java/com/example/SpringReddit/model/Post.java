@@ -32,12 +32,10 @@ public class Post {
 	private String description;
 	private Integer voteCount = 0;
 
-	@JoinColumn(name = "userId", referencedColumnName = "userId")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private RedditUser user;
 	private Instant createdDate;
 
-	@JoinColumn(name = "subId", referencedColumnName = "id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Subreddit subreddit;
 

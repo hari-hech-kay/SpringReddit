@@ -26,6 +26,8 @@ public abstract class PostMapper {
 	@Mapping(target = "description", source = "postRequest.description")
 	@Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
 	@Mapping(target = "voteCount", constant = "0")
+	@Mapping(target = "subreddit", source = "subreddit")
+	@Mapping(target = "user", source = "user")
 	public abstract Post fromDto(PostRequest postRequest, Subreddit subreddit, RedditUser user);
 
 	@Mapping(target = "username", source = "user.username")
@@ -44,6 +46,8 @@ public abstract class PostMapper {
 	}
 
 	VoteType getVoteType(Post post) {
+		RedditUser user = authService.getCurrentUser();
+		if (user == null) return null;
 		Optional<Vote> voteOptional = voteRepository.findByPostAndUser(post, authService.getCurrentUser());
 		return voteOptional.map(Vote::getVoteType).orElse(null);
 	}

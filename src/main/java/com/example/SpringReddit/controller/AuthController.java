@@ -7,6 +7,9 @@ import com.example.SpringReddit.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
+
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor
@@ -15,7 +18,7 @@ public class AuthController {
 	AuthService authService;
 
 	@PostMapping("/signup")
-	public String signup(@RequestBody RegisterRequest registerRequest) {
+	public String signup(@Valid @RequestBody RegisterRequest registerRequest) {
 		authService.signup(registerRequest);
 		return "User registration successful";
 	}
@@ -27,7 +30,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
+	public AuthenticationResponse login(@Valid @RequestBody LoginRequest loginRequest) {
 		return authService.login(loginRequest);
 	}
 

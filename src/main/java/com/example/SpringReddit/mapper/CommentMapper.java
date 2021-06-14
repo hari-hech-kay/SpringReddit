@@ -11,6 +11,8 @@ import org.mapstruct.Mapping;
 public abstract class CommentMapper {
 
 	@Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
+	@Mapping(target = "user", source = "user")
+	@Mapping(target = "post", source = "post")
 	public abstract Comment fromDto(CommentDto commentDto, Post post, RedditUser user);
 
 	@Mapping(target = "postId", source = "post.postId")

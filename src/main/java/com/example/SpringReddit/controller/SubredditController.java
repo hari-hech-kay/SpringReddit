@@ -5,6 +5,7 @@ import com.example.SpringReddit.service.SubredditService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -15,7 +16,7 @@ public class SubredditController {
 	SubredditService subredditService;
 
 	@PostMapping
-	public SubredditDto createSubreddit(@RequestBody SubredditDto subredditDto) {
+	public SubredditDto createSubreddit(@Valid @RequestBody SubredditDto subredditDto) {
 		return subredditService.create(subredditDto);
 	}
 
