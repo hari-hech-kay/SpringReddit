@@ -14,6 +14,7 @@ import com.example.SpringReddit.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -85,7 +86,7 @@ public class AuthService {
 
 	public RedditUser getCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth == null) return null;
+		if (auth instanceof AnonymousAuthenticationToken) return null;
 		User principal = (User) auth.getPrincipal();
 		return userRepository.findByUsername(principal.getUsername())
 				.orElseThrow(() -> new UserNotFoundException("User not found with username " + principal.getUsername()));

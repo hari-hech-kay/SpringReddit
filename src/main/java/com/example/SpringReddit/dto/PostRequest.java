@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@NonNull
 public class PostRequest {
 
 	private String postName;

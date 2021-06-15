@@ -41,7 +41,7 @@ public class RedditExceptionHandler extends ResponseEntityExceptionHandler {
 						.build());
 	}
 
-	@ExceptionHandler(value = {PostNotFoundException.class, SubredditNotFoundException.class, CommentNotFoundException.class})
+	@ExceptionHandler(value = {PostNotFoundException.class, SubredditNotFoundException.class, CommentNotFoundException.class, UserNotFoundException.class})
 	public ResponseEntity<ApiErrorResponse> notFoundException(RuntimeException exception) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 				.body(ApiErrorResponse.builder()

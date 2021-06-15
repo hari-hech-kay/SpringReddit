@@ -65,7 +65,7 @@ public class PostService {
 	@Transactional(readOnly = true)
 	public List<PostResponse> getPostsByUser(String username) {
 		RedditUser user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new UserNotFoundException("User with id " + username + " does not exist"));
+				.orElseThrow(() -> new UserNotFoundException(username));
 		return postRepository.findAllByUser(user)
 				.stream().map(postMapper::toDto)
 				.collect(Collectors.toList());

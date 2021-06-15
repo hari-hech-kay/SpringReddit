@@ -36,12 +36,14 @@ public class VoteService {
 				voteRepository.save(vote);
 				post.setVoteCount(voteDto.getVoteType().getDirection() * 2);
 			}
+			postRepository.save(post);
 		} else saveVote(voteDto, post);
 	}
 
 	private void saveVote(VoteDto voteDto, Post post) {
 		voteRepository.save(fromDto(voteDto, post));
 		post.setVoteCount(voteDto.getVoteType().getDirection());
+		postRepository.save(post);
 	}
 
 	private Vote fromDto(VoteDto voteDto, Post post) {
